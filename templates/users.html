@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пользователи</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Все зарегистрированные пользователи</h1>
+
+        {% for user in users %}
+        <div class="user-card">
+            <div class="user-info">
+
+                {% if user.photo_path %}
+                    <img src="{{ url_for('static', filename=user.photo_path) }}" class="post-image">
+                        {% endif %}
+                👤 <strong>Имя:</strong> {{ user.name }} <br>
+                📞 <strong>Телефон:</strong> {{ user.phone }} <br>
+                🎂 <strong>Возраст:</strong> {{ user.age }} лет <br>
+                📧 <strong>Почта:</strong> {{ user.mail }} <br>
+                🎮 <strong>Ник:</strong> {{ user.nickname }}<br>
+
+            {% if user.phone.startswith('+7') %}
+                <div class="user-info"><strong>🇷🇺 Вы из России</strong></div>
+            {% elif user.phone.startswith('+992') %}
+                <div class="user-info"><strong>🇹🇯 Вы из Таджикистана</strong></div>
+            {% elif user.phone.startswith('+1') %}
+                <div class="user-info"><strong>🇺🇸 Вы из США</strong></div>
+            {% elif user.phone.startswith('+686') %}
+                <div class="user-info"><strong>🇰🇮 Вы из Кирибати</strong></div>
+            {% elif user.phone.startswith('+850') %}
+                <div class="user-info"><strong>🇰🇵 Вы из КНДР</strong></div>
+            {% elif user.phone.startswith('+299') %}
+                <div class="user-info"><strong>🇬🇱 Вы из Гренландии</strong></div>
+            {% elif user.phone.startswith('+67') %}
+                <div class="user-info"><strong>⚠️ У вас 67 мозга... это неизлечимо...вас необходимо усыпить...</strong></div>
+            {% endif %}
+            </div>
+
+            {% if user.nickname == '1nicopatty' or user.nickname =='chebus' or user.nickname =='Mihmelnik' %}
+                <div class="status success">✅ Вы состоите в сервере!</div>
+            {% else %}
+                <div class="status error">❌ Вас ещё нет в списках игроков сервера.</div>
+            {% endif %}
+
+            {% if user.phone.startswith('7') %}
+                <div class="country">🇷🇺 Вы из России</div>
+            {% elif user.phone.startswith('992') %}
+                <div class="country">🇹🇯 Вы из Таджикистана</div>
+            {% elif user.phone.startswith('1') %}
+                <div class="country">🇺🇸 Вы из США</div>
+            {% elif user.phone.startswith('686') %}
+                <div class="country">🇰🇮 Вы из Кирибати</div>
+            {% elif user.phone.startswith('850') %}
+                <div class="country">🇰🇵 Вы из КНДР</div>
+            {% elif user.phone.startswith('299') %}
+                <div class="country">🇬🇱 Вы из Гренландии</div>
+            {% elif user.phone.startswith('67') %}
+                <div class="country">⚠️ У вас 67 мозга... это неизлечимо...вас необходимо усыпить...</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        {% if not users %}
+            <div class="empty-message">
+                📭 Пока никто не зарегистрировался
+            </div>
+        {% endif %}
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <a href="/" class="zov-btn">
+        ← Вернуться к регистрации
+      </a>
+
+        <a href="/read" class="zov-btn">
+            Смотреть посты
+        </a>
+      <a href="/posts" class="zov-btn">
+        Сделать пост
+      </a>
+    </div>
+</body>
+</html>

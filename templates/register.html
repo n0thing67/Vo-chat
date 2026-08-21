@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Зарегистрируйтесь на сайте</h1>
+
+        {% if error %}
+            <div class = "status-error">{{ error }}</div>
+        {% endif %}
+
+        <form action="/register" method="POST" enctype="multipart/form-data">
+            <label>Имя:</label>
+            <input type="text" name="name" required placeholder="Введите ваше имя" value="{{name or ''}}">
+
+            <label>Номер телефона:</label>
+            <input type="tel" name="phone" required placeholder="+7 (999) 123-45-67" title="Введите номер в формате +7 (999) 123-45-67" value="{{phone or ''}}">
+
+            <label>Возраст:</label>
+            <input type="number" name="age" min="0" max="150" required placeholder="Сколько вам лет?" value="{{age or ''}}">
+
+            <label>Почта:</label>
+            <input type="text" name="mail" required placeholder="example@email.com" value="{{mail or ''}}">
+
+            <label>Nickname:</label>
+            <input type="text" name="nickname" required placeholder="Ваш игровой ник" value="{{nickname or ''}}">
+
+
+            <label>Пароль:</label>
+            <input type="password" name="password" required placeholder="Введите пароль">
+
+
+            <input type="file" name="photo" id="photo"  accept=".png,.jpg,.jpeg" class="file-input">
+            <label for="photo" class="custom-file-button">
+                Выбрать фото
+            </label>
+
+
+                  <a href="{{url_for('Signin')}}" class="sing">
+                    Войти
+
+                </a>
+
+
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+
+
+          <a href="https://steamcommunity.com/profiles/76561199808884815/" class="gift-btn">
+                Смотреть профиль стим разаработчика
+          </a>
+    </div>
+</body>
+</html>

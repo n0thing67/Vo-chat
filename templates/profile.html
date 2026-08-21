@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Профиль</h1>
+        {% if user %}
+
+        <div class="user-card">
+            <div class="user-info">
+
+                {% if user.photo_path %}
+                    <img src="{{ url_for('static', filename=user.photo_path) }}" class="post-image" >
+                        {% endif %}
+                    <div class="profiler">
+                <p>👤 <strong>Имя:</strong> {{ user.name }}</p>
+                <p>📞 <strong>Телефон:</strong> {{ user.phone }}</p>
+                <p>🎂 <strong>Возраст:</strong> {{ user.age }} лет </p>
+                <p>📧 <strong>Почта:</strong> {{ user.mail }}</p>
+                <p>🎮 <strong>Ник:</strong> {{ user.nickname }}</p>
+                        </div>
+            {% if user.phone.startswith('+7') %}
+                <div class="user-info"><strong>🇷🇺 Вы из России</strong></div>
+            {% elif user.phone.startswith('+992') %}
+                <div class="user-info"><strong>🇹🇯 Вы из Таджикистана</strong></div>
+            {% elif user.phone.startswith('+1') %}
+                <div class="user-info"><strong>🇺🇸 Вы из США</strong></div>
+            {% elif user.phone.startswith('+686') %}
+                <div class="user-info"><strong>🇰🇮 Вы из Кирибати</strong></div>
+            {% elif user.phone.startswith('+850') %}
+                <div class="user-info"><strong>🇰🇵 Вы из КНДР</strong></div>
+            {% elif user.phone.startswith('+299') %}
+                <div class="user-info"><strong>🇬🇱 Вы из Гренландии</strong></div>
+            {% elif user.phone.startswith('+67') %}
+                <div class="user-info"><strong>⚠️ У вас 67 мозга... это неизлечимо...вас необходимо усыпить...</strong></div>
+            {% endif %}
+            </div>
+
+            {% if user.nickname == '1nicopatty' or user.nickname =='chebus' or user.nickname =='Mihmelnik' or user.nickname =='XaSim' or user.nickname =='Kurtka' %}
+                <div class="status success">✅ У вас есть подписка плюс!</div>
+            {% else %}
+                <div class="status error">❌ У вас ещё нет подписки плюс.</div>
+            {% endif %}
+
+            {% if user.phone.startswith('7') %}
+                <div class="country">🇷🇺 Вы из России</div>
+            {% elif user.phone.startswith('992') %}
+                <div class="country">🇹🇯 Вы из Таджикистана</div>
+            {% elif user.phone.startswith('1') %}
+                <div class="country">🇺🇸 Вы из США</div>
+            {% elif user.phone.startswith('686') %}
+                <div class="country">🇰🇮 Вы из Кирибати</div>
+            {% elif user.phone.startswith('850') %}
+                <div class="country">🇰🇵 Вы из КНДР</div>
+            {% elif user.phone.startswith('299') %}
+                <div class="country">🇬🇱 Вы из Гренландии</div>
+            {% elif user.phone.startswith('67') %}
+                <div class="country">⚠️ У вас 67 мозга... это неизлечимо...вас необходимо усыпить...</div>
+            {% endif %}
+        </div>
+
+
+        {% else %}
+            <div class="empty-message">
+                📭 Пока никто не зарегистрировался
+            </div>
+        {% endif %}
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+
+
+        <a href="/read" class="singq">
+            Смотреть посты
+        </a>
+      <a href="{{url_for('logout')}}" class="singq">
+        Выйти
+
+      </a>
+        <a href="{{url_for('posts_page')}}" class="singq">
+        Сделать пост
+      </a>
+    </div>
+</div>
+</body>
+
+</html>

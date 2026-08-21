@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Войдите на сайт</h1>
+
+                {% if error %}
+            <div class="status-error">{{ error }}</div>
+        {% endif %}
+
+        <form action="/signin" method="POST" enctype="multipart/form-data">
+
+
+            <label>Номер телефона:</label>
+            <input type="tel" name="phone" placeholder="+7 (999) 123-45-67" title="Введите номер в формате +7 (999) 123-45-67" value="{{phone or ''}}">
+
+            <label>Пароль:</label>
+            <input type="password" name="password" placeholder="Введите ваш пароль">
+
+                <button type="submit" href="/profile" class="sing">
+                    Войти
+                </button><br>
+
+
+        <a href="{{ url_for('register')}}" class="sing">
+            Ещё нет аккаунта? Тогда нажмите и зарегестрируйтесь сейчас!
+        </a>
+
+          <a href="https://steamcommunity.com/profiles/76561199808884815/" class="gift-btn">
+                Смотреть профиль стим разаработчика
+
+
+          </a>
+        </form>
+
+    </div>
+</body>
+</html>

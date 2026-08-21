@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Посты</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='stile.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>Посты</h1>
+
+    {% if not posts %}
+      <div class="empty-message">📭 Пока постов нет</div>
+    {% endif %}
+
+    {% for p in posts %}
+      <div class="user-card">
+           {% if p.avatar %}
+        <img src="{{ url_for('static', filename=p.avatar) }}" class="nikita-image">
+      {% endif %}
+        <div class="user-info">
+
+          <div class="user-mark">
+          👤 <strong>Имя:</strong> {{ p.pname }}<br>
+            💬 <strong>Сообщение:</strong> {{ p.mark }}<br>
+                <button type="button" class="like" data-post-id="{{p.id}}" onclick="changesmile(this)">{%if p.id in userLike %} ❤️ {%else%} 🤍 {%endif%}</button><span class="count">{{p.likes}}</span>
+
+
+
+            {% if p.photo %}
+          <img src="{{ url_for('static', filename=p.photo) }}" class="post-image">
+      {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+<div style="display: flex; justify-content: space-between; align-items: center;">
+  <a href="{{ url_for('posts_page') }}" class="gift-btn">
+    ← Вернуться к отправке
+  </a>
+
+  <a href="/profile" class="gift-btn">
+    Профиль
+  </a>
+
+  <a href="https://vk.com/video-127960182_456239022" class="gift-btn">
+    Получить подарок
+  </a>
+  </a>
+</div>
+  </div>
+<script>
+async function changesmile(button) {
+    const postId = button.dataset.postId;
+    button.disabled = true;
+    try {
+        const response = await fetch(`/like/${postId}`, {
+            method: "POST"
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            alert(result.error || "Не удалось изменить лайк");
+            return;
+        }
+
+        const countSpan = button.nextElementSibling;
+        countSpan.textContent = result.likes;
+
+        if (result.liked) {
+            button.textContent = "❤️";
+            button.dataset.liked = "true";
+        } else {
+            button.textContent = "🤍";
+            button.dataset.liked = "false";
+        }
+
+    } catch (error) {
+        console.error("Ошибка лайка:", error);
+        alert("Ошибка при обработке лайка");
+    } finally {
+        button.disabled = false;
+    }
+}
+</script>
+</body>
+</html>
+
+

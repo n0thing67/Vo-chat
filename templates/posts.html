@@ -1,0 +1,39 @@
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сделать пост</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='stile.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Создать пост</h1>
+
+        {% if error %}
+            <div class="status-error">{{ error }}</div>
+        {% endif %}
+
+        <form action="{{ url_for('posts_page') }}" method="POST" enctype="multipart/form-data" >
+            <p class="imtiredbutton">
+                <strong>Имя:</strong>
+                <span class='name-text'>{{user.name}}</span>
+            </p>
+
+
+            <input type="text" name="mark" placeholder="Введите сообщение" maxlength="100">
+
+
+
+            <input type="file" name="photo" id="photo" accept=".png,.jpg,.jpeg" class="file-input">
+            <label for="photo"  class="custom-file-button">Выбрать фото</label>
+
+            <button type="submit">Запостить</button>
+        </form>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+            <a href="/profile" class="gift-btn">Профиль</a>
+            <a href="/read" class="gift-btn">Смотреть посты</a>
+        </div>
+    </div>
+</body>
+</html>
