@@ -15,7 +15,7 @@
             <div class="user-info">
 
                 {% if user.photo_path %}
-                    <img src="{{ url_for('static', filename=user.photo_path) }}" class="post-image">
+                    <img src="{{user.photo_path}}" class="post-image">
                         {% endif %}
                 👤 <strong>Имя:</strong> {{ user.name }} <br>
                 📞 <strong>Телефон:</strong> {{ user.phone }} <br>

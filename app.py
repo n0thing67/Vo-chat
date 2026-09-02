@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for,session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
+from supabase import create_client
 import os
 import uuid
 import hashlib
@@ -17,10 +18,13 @@ with app.app_context():
     db.create_all()
     print("Database created")
 app.secret_key = os.environ.get('SECRET_KEY')
-
+SUPABASE_URL=os.environ.get('SUPABASE_URL')
+SUPABASE_SECRET_KEY=os.environ.get('SUPABASE_SECRET_KEY')
+supabase = create_client(SUPABASE_URL, SUPABASE_SECRET_KEY)
 """users = []
 posts = []
 likes = []"""
+
 
 uploader = os.path.join(app.static_folder, 'image')
 format = {'png', 'jpg', 'jpeg'}
@@ -28,6 +32,19 @@ app.config['UPLOAD_FOLDER'] = uploader
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 def allowed_file(filename:str)->bool:
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in format
+def load_image_sup (file):
+    if not file or not file.filename:
+        return None
+    if not allowed_file(file.filename):
+        return None
+    original=secure_filename(file.filename)
+    opiograf=original.rsplit('.',1)[-1].lower()
+    filename=f'{uuid.uuid4().hex}.{opiograf}'
+    file_bytes=file.read()
+    content_type=file.mimetype or f'image/{opiograf}'
+    supabase.storage.from_('images').upload(path=filename,file=file_bytes, file_options={'content-type':content_type, 'upsert':'false'})
+    public_url=supabase.storage.from_('images').public_url(filename)
+    return public_url
 class User(db.Model):
     __tablename__ = "users"
 
@@ -35,7 +52,7 @@ class User(db.Model):
     name = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(30), unique=True, nullable=False)
     age = db.Column(db.Integer, nullable=False)
-    mail = db.Column(db.String(120), nullable=False)
+    mail = db.Column(db.String(120), nsullable=False)
     nickname = db.Column(db.String(100), unique=True, nullable=False)
     photo_path = db.Column(db.String(255))
     password = db.Column(db.String(100), nullable=False)
@@ -124,19 +141,10 @@ def register():
     photo=request.files.get("photo")
     photo_path = None
     if photo and photo.filename:
-        if allowed_file(photo.filename):
-            os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
-            original=secure_filename(photo.filename)
-            ext=original.rsplit(".", 1)[-1].lower()
-            special_name=f'{uuid.uuid4().hex}{ext}'
-            save_path = os.path.join(app.config["UPLOAD_FOLDER"], special_name)
-            photo.save(save_path)
-            photo_path = f'image/{special_name}'
-        else:
-            return render_template('register.html', error="Можно загружать только изображения формата Jpg и PNG")
-
-
-
+        if not allowed_file(photo.filename):
+            return render_template(
+                'register.html', error="Можно загружать только png и jpg")
+        photo_path = load_image_sup(photo)
 
     user=User(
         name=name,
@@ -211,15 +219,10 @@ def posts_page():
     photo=request.files.get("photo")
     photo_path = None
     if photo and photo.filename:
-        if allowed_file(photo.filename):
-            os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
-            original=secure_filename(photo.filename)
-            ext=original.rsplit(".", 1)[-1].lower()
-            special_name=f'{uuid.uuid4().hex}.{ext}'
-            save_path = os.path.join(app.config["UPLOAD_FOLDER"], special_name)
-            photo.save(save_path)
-            photo_path = f'image/{special_name}'
-
+        if not allowed_file(photo.filename):
+            return render_template(
+                'posts.html', error="Можно загружать только png и jpg", user=user)
+        photo_path = load_image_sup(photo)
 
 
     post=Post(
