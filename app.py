@@ -1,14 +1,39 @@
-from dotenv import load_dotenv
+from dotenv import load_dotenv, dotenv_values
 from flask import Flask, render_template, request, redirect, url_for,session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 from supabase import create_client
+from pathlib import Path
 import os
 import uuid
 import hashlib
 import secrets
 import hmac
-load_dotenv()
+env_path = Path(__file__).resolve().parent.parent / ".env"
+
+if not env_path.is_file():
+    raise FileNotFoundError(f"Не найден .env: {env_path}")
+
+values = dotenv_values(env_path)
+
+required = [
+    "DATABASE_URL",
+    "SECRET_KEY",
+    "SUPABASE_URL",
+    "SUPABASE_SECRET_KEY"
+]
+
+for name in required:
+    print(name, "OK" if values.get(name) else "MISSING")
+
+load_dotenv(env_path, override=True)
+
+missing = [name for name in required if not os.getenv(name)]
+
+if missing:
+    raise RuntimeError(
+        "Отсутствуют переменные: " + ", ".join(missing)
+    )
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
@@ -42,8 +67,9 @@ def load_image_sup (file):
     filename=f'{uuid.uuid4().hex}.{opiograf}'
     file_bytes=file.read()
     content_type=file.mimetype or f'image/{opiograf}'
-    supabase.storage.from_('images').upload(path=filename,file=file_bytes, file_options={'content-type':content_type, 'upsert':'false'})
-    public_url=supabase.storage.from_('images').public_url(filename)
+    bucket=supabase.storage.from_('images')
+    bucket.upload(path=filename,file=file_bytes, file_options={'content-type':content_type, 'upsert':'false'})
+    public_url=bucket.get_public_url(filename)
     return public_url
 class User(db.Model):
     __tablename__ = "users"
@@ -52,7 +78,7 @@ class User(db.Model):
     name = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(30), unique=True, nullable=False)
     age = db.Column(db.Integer, nullable=False)
-    mail = db.Column(db.String(120), nsullable=False)
+    mail = db.Column(db.String(120), nullable=False)
     nickname = db.Column(db.String(100), unique=True, nullable=False)
     photo_path = db.Column(db.String(255))
     password = db.Column(db.String(100), nullable=False)
@@ -128,7 +154,7 @@ def register():
             nickname=nickname,
         )
 
-    if User.query.filter_by(phone=phone).first():
+    if User.query.filter_by(nickname=nickname).first():
         return render_template(
             "register.html",
             error="Этот Никнэйм уже занят",
@@ -143,8 +169,12 @@ def register():
     if photo and photo.filename:
         if not allowed_file(photo.filename):
             return render_template(
-                'register.html', error="Можно загружать только png и jpg")
-        photo_path = load_image_sup(photo)
+                'register.html', error="Можно загружать только png и jpg", name=name, phone=phone, age=age_str,mail=mail, nickname=nickname)
+        try:
+            photo_path = load_image_sup(photo)
+        except Exception as e:
+            print('ошибка загрузки изображения')
+            return render_template('register.html', error="Можно загружать только png и jpg", name=name, phone=phone, age=age_str,mail=mail, nickname=nickname)
 
     user=User(
         name=name,
